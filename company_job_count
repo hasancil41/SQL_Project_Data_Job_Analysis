@@ -1,0 +1,32 @@
+/* 
+ Find the companies thah have the most job opening,
+ -Get the total number of job posting per company_id
+ -Return the total number of jobs with the company name,
+ -Companies with more than '100' jobs
+ -Get all 'Data Analyst' jobs.
+ -Ony show job_country 'United Satetes'
+ -Avg salaary with exclude rows
+ */
+WITH company_job_count AS (
+    SELECT company_id,
+        job_title_short,
+        COUNT(*) AS total_jobs,
+        job_country,
+        round(avg(salary_year_avg), 2) as avg_salary
+    FROM job_postings_fact
+    GROUP BY company_id,
+        job_title_short,
+        job_country
+    HAVING COUNT(*) > 100
+)
+SELECT company_dim.name AS company_name,
+    company_job_count.total_jobs,
+    company_job_count.job_country,
+    company_job_count.avg_salary
+FROM company_dim
+    LEFT JOIN company_job_count ON company_job_count.company_id = company_dim.company_id
+WHERE company_job_count.total_jobs is NOT NULL
+    AND company_job_count.job_title_short = 'Data Analyst'
+    AND company_job_count.job_country = 'United States'
+    AND company_job_count.avg_salary is not null
+ORDER BY total_jobs DESC;
