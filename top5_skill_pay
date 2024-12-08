@@ -1,0 +1,34 @@
+/*
+Find the count of the number of remote job per skill,
+-Display top 5 skill by their demand in remote job
+-Include skill ID , name, and copunt of postings requiring the skill
+-Yearly min and max saalary 
+-For 'Data Analyst' 
+
+*/
+
+WITH remote_job_skill AS (
+    SELECT 
+        skill_job.skill_id,
+        COUNT(*) AS skill_count,
+        MIN(job_posting.salary_year_avg) AS min_salary,
+        MAX(job_posting.salary_year_avg) AS max_salary
+    FROM skills_job_dim AS skill_job
+    INNER JOIN job_postings_fact AS job_posting 
+        ON job_posting.job_id = skill_job.job_id
+    WHERE job_posting.job_work_from_home = TRUE and job_posting.job_title_short='Data Analyst' 
+        
+    GROUP BY skill_job.skill_id
+)
+SELECT 
+    skill.skill_id,
+    skill.skills AS skill_name,
+    remote_job_skill.skill_count,
+    remote_job_skill.min_salary,
+    remote_job_skill.max_salary
+FROM remote_job_skill
+INNER JOIN skills_dim AS skill 
+    ON skill.skill_id = remote_job_skill.skill_id
+ORDER BY remote_job_skill.skill_count DESC
+LIMIT 5;
+
