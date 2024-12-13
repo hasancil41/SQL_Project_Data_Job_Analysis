@@ -1,0 +1,40 @@
+/* 
+  Data Analyst Job Analysis for [Company Name]
+
+## Overview
+This project, conducted for **[Company Name]**, focuses on analyzing job postings data to derive insights on:
+- Experience levels of 'Data Analyst' roles in the United States.
+- Remote work opportunities offered by companies.
+- Salary range categorization (High, Average, Lower).
+- skills 
+ 
+ */
+SELECT job_postings_fact.job_id,
+    company_dim.NAME AS company_name,
+    STRING_AGG(skills_dim.skills, ', ') AS skills,  -- Aggregating skills into a single string
+    ROUND(job_postings_fact.salary_year_avg, 1) AS rounded_salary,
+    CASE
+        WHEN job_postings_fact.job_title ILIKE '%Senior%' THEN 'Senior'
+        WHEN job_postings_fact.job_title ILIKE '%Manager%' OR job_postings_fact.job_title ILIKE '%Lead%' THEN 'Lead/Manager'
+        WHEN job_postings_fact.job_title ILIKE '%Junior%' OR job_postings_fact.job_title ILIKE '%Entry%' THEN 'Junior/Entry'
+        ELSE 'Not specific'
+    END AS experience_level,
+    CASE
+        WHEN job_postings_fact.job_work_from_home THEN 'Yes'
+        ELSE 'No'
+    END AS remote_option,
+    CASE
+        WHEN job_postings_fact.salary_year_avg > 150000 THEN 'High_Salary'
+        WHEN job_postings_fact.salary_year_avg BETWEEN 125001 AND 150000 THEN 'Avg_Salary'
+        ELSE 'Lower_salary'
+    END AS salary_option
+FROM job_postings_fact
+LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
+LEFT JOIN skills_job_dim ON job_postings_fact.job_id = skills_job_dim.job_id
+LEFT JOIN skills_dim ON skills_job_dim.skill_id = skills_dim.skill_id
+WHERE job_postings_fact.salary_year_avg IS NOT NULL
+    AND job_postings_fact.job_country = 'United States'
+    AND job_postings_fact.job_title = 'Data Analyst'
+    AND skills_dim.skills IS NOT NULL
+GROUP BY job_postings_fact.job_id, company_dim.NAME, job_postings_fact.salary_year_avg, job_postings_fact.job_title, job_postings_fact.job_work_from_home
+ORDER BY job_postings_fact.salary_year_avg DESC;
