@@ -1,0 +1,28 @@
+/*Top 10 job posting by skills
+-The project explores trends in high-paying job postings (>$125,000 annual average salary) 
+-For roles offering health insurance 
+-In the United States during Q2. 
+-Key features include filtering by specific skills (Python, SQL, Tableau) 
+-Aggregating data to identify top companies and required skill sets.
+
+*/
+
+SELECT 
+    COUNT(job_postings_fact.job_id) AS job_count,
+    company_dim.name AS company_name,
+    STRING_AGG(DISTINCT skills_dim.skills, ', ') AS skills
+FROM job_postings_fact
+    INNER JOIN company_dim 
+        ON job_postings_fact.company_id = company_dim.company_id
+    LEFT JOIN skills_job_dim 
+        ON job_postings_fact.job_id = skills_job_dim.job_id
+    LEFT JOIN skills_dim 
+        ON skills_job_dim.skill_id = skills_dim.skill_id
+WHERE job_postings_fact.job_health_insurance IS TRUE
+    AND EXTRACT(QUARTER FROM job_postings_fact.job_posted_date) = 2
+    AND job_postings_fact.job_country = 'United States' AND skills in ('python', 'sql', 'tableau')
+GROUP BY company_dim.name
+HAVING COUNT(job_postings_fact.job_id) > 1 
+   AND AVG(job_postings_fact.salary_year_avg) >= 125000
+ORDER BY job_count DESC
+LIMIT 10;
