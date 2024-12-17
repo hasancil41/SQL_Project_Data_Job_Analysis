@@ -1,8 +1,9 @@
-/*Create a unified query that categorizes job postings into two groups: 
+/*
+Create a unified query that categorizes job postings into two groups: 
 Those with salary information (salary_year_avg or salary_hour_avg is not null) and those without it. 
 Each job posting listed with its job_id, job_title, job_title (Data Analyst and Business Analyst) and an indicator of whether salary information is provided.
 
-Use UNION ALL to merge results from two separate queries.
+UNION ALL to merge results from two separate queries.
 For the first query, filter job postings where either salary field is not null to identify postings with salary informations.
 For the second query, filter for postings where both salary fields are null to identify postings without salary information.
 Include a custom field to indicate the presence or absence of salary information in the output.
