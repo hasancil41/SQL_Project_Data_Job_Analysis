@@ -1,0 +1,13 @@
+# SQL Query to Filter City Names Starting and Ending with Vowels
+
+## Description
+
+This repository provides a solution for querying a list of city names from a database table named `STATION` where both the first and last characters of the city name are vowels (i.e., 'a', 'e', 'i', 'o', 'u'). The result is filtered to exclude any duplicates.
+
+## SQL Query
+
+```sql
+SELECT DISTINCT CITY
+FROM STATION
+WHERE LOWER(SUBSTRING(CITY, 1, 1)) IN ('a', 'e', 'i', 'o', 'u')
+  AND LOWER(SUBSTRING(CITY, LENGTH(CITY), 1)) IN ('a', 'e', 'i', 'o', 'u');
