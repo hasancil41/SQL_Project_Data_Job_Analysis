@@ -56,7 +56,7 @@ SELECT
     job_id,
     job_title_short,
     salary_year_avg,
-    job_posted_date
+    job_posted_date::DATE
 FROM 
     filtered_jobs
 ORDER BY 
